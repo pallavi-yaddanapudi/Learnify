@@ -1,18 +1,6 @@
 import { Menu, School } from "lucide-react";
 import React, { useEffect } from "react";
-import { Button } from "./button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Separator,
-} from "@radix-ui/react-dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import DarkMode from "@/pages/DarkMode";
+
 import {
   Sheet,
   SheetClose,
@@ -25,6 +13,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLogoutUserMutation } from "@/features/api/authApi";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuGroup,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Separator } from "./separator";
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+import DarkMode from "@/DarkMode";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
@@ -46,9 +47,11 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto hidden md:flex justify-between items-center gap-10 h-full">
         <div className="flex items-center gap-2">
           <School size={30} />
-          <h1 className="hidden md:block font-extrabold text-2xl">
-            E-Learning
-          </h1>
+          <Link to="/">
+            <h1 className="hidden md:block font-extrabold text-2xl">
+              E-Learning
+            </h1>
+          </Link>
         </div>
         <div>
           <div className="flex items-center gap-8">
@@ -94,10 +97,10 @@ const Navbar = () => {
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
-                  {user.role === "instuctor" && (
+                  {user?.role === "instructor" && (
                     <>
                       <DropdownMenuItem className="px-3 py-2 text-sm text-gray-700 dark:text-gray-100 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800">
-                        Dashboard
+                        <Link to="/admin/dashboard">Dashboard</Link>
                       </DropdownMenuItem>
                     </>
                   )}
@@ -119,7 +122,7 @@ const Navbar = () => {
       </div>
       <div className="flex md:hidden items-center justify-between px-4 h-full">
         <h1 className="font-extrabold text-2xl">E-Learning</h1>
-        <MobileNavbar />
+        <MobileNavbar user={user} />
       </div>
     </div>
   );
@@ -127,15 +130,15 @@ const Navbar = () => {
 
 export default Navbar;
 
-const MobileNavbar = () => {
-  const role = "instructor";
+const MobileNavbar = ({ user }) => {
+  const navigate = useNavigate();
 
   return (
     <Sheet>
       <SheetTrigger asChild>
         <Button
           size="icon"
-          className="rounded-full bg-gray-200 hover:bg-gray-300"
+          className="rounded-full hover:bg-gray-300"
           variant="outline"
         >
           <Menu />
@@ -145,7 +148,7 @@ const MobileNavbar = () => {
       <SheetContent className="flex flex-col justify-between p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between mt-4">
-          <SheetTitle className="text-lg font-semibold">E-Learning</SheetTitle>
+          <SheetTitle className="text-lg font-semibold"><Link to ="/">E-Learning</Link></SheetTitle>
           <DarkMode />
         </div>
 
@@ -154,17 +157,21 @@ const MobileNavbar = () => {
         {/* Navigation */}
         <nav className="flex flex-col gap-4 text-base font-medium">
           <span className="hover:text-black-600 cursor-pointer">
-            My Learning
+           <Link to ="/my-learning">My Learning</Link> 
           </span>
           <span className="hover:text-black-600 cursor-pointer">
-            Edit Profile
+            <Link to="/profile">Edit Profile</Link>
           </span>
           <span className="hover:text-black-600 cursor-pointer">Log out</span>
         </nav>
-        {role === "instructor" && (
+        {user?.role === "instructor" && (
           <SheetFooter className="mt-auto">
             <SheetClose asChild>
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={() => navigate("/admin/dashboard")}
+              >
                 DashBoard
               </Button>
             </SheetClose>

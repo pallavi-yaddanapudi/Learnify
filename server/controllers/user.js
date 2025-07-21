@@ -89,13 +89,24 @@ export const logout = async (req, res) => {
 export const getUserProfile = async (req, res) => {
   try {
     const userId = req.id;
-    const user = await User.findById(userId).select("-password");
+
+    const user = await User.findById(userId)
+      .select("-password")
+      .populate({
+        path: "enrolledCourses",
+        populate: {
+          path: "creator",
+          select: "name photoUrl",
+        },
+      });
+
     if (!user) {
       return res.status(404).json({
         success: false,
         message: "Profile not found",
       });
     }
+
     return res.status(200).json({
       success: true,
       user,
@@ -107,6 +118,7 @@ export const getUserProfile = async (req, res) => {
     });
   }
 };
+
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.id;
@@ -142,7 +154,6 @@ export const updateProfile = async (req, res) => {
       user: updatedUser,
       message: "Profile updated successfully",
     });
-
   } catch (err) {
     console.log(err);
     return res.status(500).json({
